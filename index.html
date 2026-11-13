@@ -139,9 +139,19 @@ ul,ol{margin:0;padding:0;list-style:none}
 .list{display:grid;gap:var(--s2)}
 .gh{font-size:var(--f2);font-weight:700;color:var(--muted);margin:var(--s4) 0 var(--s1)}
 .gh:first-child{margin-top:0}
-.it{background:var(--soft);border-radius:var(--r3);scroll-margin-top:var(--s3)}
-.it.is-closed .it-n,.it.is-closed > .it-h > .ic{opacity:.55}
-.it-h{display:flex;align-items:center;gap:var(--s3);width:100%;min-height:58px;padding:var(--s3) var(--s4);background:none;border:0;border-radius:var(--r3);text-align:left}
+.it{display:grid;grid-template-columns:auto 1fr;align-items:center;background:var(--soft);border-radius:var(--r3);scroll-margin-top:var(--s3);transition:background-color .25s}
+.it.is-closed .it-n{opacity:.55}
+.it-c{margin:0 -8px 0 var(--s2)}
+.it-h{display:flex;align-items:center;gap:var(--s3);width:100%;min-width:0;min-height:58px;padding:var(--s3) var(--s4) var(--s3) var(--s2);background:none;border:0;border-radius:var(--r3);text-align:left}
+.it-d{grid-column:1/-1}
+.it.is-done{background:var(--good)}
+.it.is-done .it-c .box,.it .it-c input:checked ~ .box{background:var(--free);border-color:var(--free)}
+.it.is-done .box .ic{opacity:1}
+.gh.dh{display:flex;align-items:center;gap:6px;color:var(--free);margin-top:var(--s4)}
+.jump.is-done > .ic{color:var(--free)}
+.jump.is-done > span{color:var(--muted)}
+.switches{display:flex;flex-wrap:wrap;gap:var(--s1) var(--s4);margin:0 0 var(--s3)}
+.switches .switch{margin:0}
 .it-h > .ic{color:var(--primary-ink)}
 .it-tm{flex:none;width:40px;font-size:var(--f2);font-weight:700;color:var(--time);font-variant-numeric:tabular-nums}
 .it-b{flex:1;min-width:0}
@@ -370,14 +380,14 @@ ul,ol{margin:0;padding:0;list-style:none}
       <div class="view" data-view="ver" hidden>
         <div class="vh"><h2 class="vt">Ver</h2><p class="vs" id="ver-ctx"></p></div>
         <div class="chips" id="ver-chips" role="group" aria-label="Qué ver"></div>
-        <label class="switch"><input type="checkbox" id="ver-open"><span class="sw" aria-hidden="true"></span><span id="ver-open-l">Ocultar lo cerrado</span></label>
+        <div class="switches"><label class="switch"><input type="checkbox" id="ver-open"><span class="sw" aria-hidden="true"></span><span>Ocultar cerrado</span></label><label class="switch"><input type="checkbox" id="ver-done"><span class="sw" aria-hidden="true"></span><span>Ocultar lo hecho</span></label></div>
         <div id="ver-list"></div>
       </div>
 
       <div class="view" data-view="comer" hidden>
         <div class="vh"><h2 class="vt">Comer</h2><p class="vs" id="com-ctx"></p></div>
         <div class="chips" id="com-chips" role="group" aria-label="Tipo de sitio"></div>
-        <label class="switch"><input type="checkbox" id="com-open"><span class="sw" aria-hidden="true"></span><span id="com-open-l">Ocultar lo cerrado</span></label>
+        <div class="switches"><label class="switch"><input type="checkbox" id="com-open"><span class="sw" aria-hidden="true"></span><span>Ocultar cerrado</span></label><label class="switch"><input type="checkbox" id="com-done"><span class="sw" aria-hidden="true"></span><span>Ocultar lo probado</span></label></div>
         <div id="com-list"></div>
       </div>
 
@@ -398,8 +408,7 @@ ul,ol{margin:0;padding:0;list-style:none}
           <div class="accb"><div class="bar" aria-hidden="true"><i data-bar="probar"></i></div>
             <p class="say"><svg class="ic sm"><use href="#i-info"/></svg><span>La fuerza va siempre en la primera sílaba. La <b>s</b> suena «sh», la <b>sz</b> suena «s» y la <b>a</b> casi como una «o».</span></p>
             <div class="chips" id="probar-tabs" role="group" aria-label="Parte de la carta"></div>
-            <ul class="cl" id="probar"></ul>
-            <details class="more"><summary><svg class="ic sm"><use href="#i-link"/></svg>Fotos: Wikimedia Commons<svg class="ic chev"><use href="#i-chev"/></svg></summary><p id="probar-cred"></p></details></div>
+            <ul class="cl" id="probar"></ul></div>
         </details>
 
         <details class="acc" name="g" id="g-maleta">
@@ -506,7 +515,7 @@ ul,ol{margin:0;padding:0;list-style:none}
           </div>
         </details>
 
-        <p class="foot">Horarios, precios y formas de pago de webs y guías consultadas en noviembre de 2026. Lo marcado con «confirmar» conviene mirarlo antes de ir. Los enlaces de mapa abren la búsqueda en Google Maps.</p>
+        <p class="foot">Horarios, precios y formas de pago de webs y guías consultadas en noviembre de 2026. Lo marcado con «confirmar» conviene mirarlo antes de ir. Los enlaces de mapa abren la búsqueda en Google Maps. Fotos de platos: <a class="lk" href="https://commons.wikimedia.org" target="_blank" rel="noopener">Wikimedia Commons<span class="sr"> (se abre en una pestaña nueva)</span></a>, licencias libres.</p>
       </div>
     </main>
 
@@ -827,16 +836,18 @@ function row(p,d,opt){
   if(st.k==='closed')sub='<span class="it-s closed">'+ic('xc','xs')+esc(st.t)+'</span>';
   else if(st.now)sub='<span class="it-s open">'+ic('clock','xs')+esc(st.t)+'</span>';
   else if(p.kind==='c')sub='<span class="it-s">'+esc(p.d)+'</span>';
-  else sub='<span class="it-s">'+(st.t&&!opt.time?ic('clock','xs')+esc(st.t)+' · ':'')+esc(p.z||'')+'</span>';
+  else sub='<span class="it-s">'+(st.t?ic('clock','xs')+esc(st.t)+' · ':'')+esc(p.z||'')+'</span>';
   var icons='';
   if(p.kind==='c'){
     if(p.cash)icons+='<span title="Solo o mejor efectivo">'+ic('cash','xs')+'<span class="sr">Efectivo</span></span>';
     if(p.card)icons+='<span title="Acepta tarjeta">'+ic('card','xs')+'<span class="sr">Tarjeta</span></span>';
     if(p.res)icons+='<span title="Conviene reservar">'+ic('cal','xs')+'<span class="sr">Conviene reservar</span></span>';
   }
-  var t=opt.time?'<span class="it-tm">'+esc(opt.time)+'</span>':'';
-  var did='d-'+p.id+(opt.k||'');
-  return '<li class="it'+cls+'" id="it-'+p.id+(opt.k||'')+'"><button type="button" class="it-h" aria-expanded="false" aria-controls="'+did+'">'+t+(opt.time?'':ic(p.i))+
+  var did='d-'+p.id+(opt.k||''), dn=!!DONE[p.id];
+  var lab=(p.kind==='c'?'Ya hemos ido: ':'Ya lo he visto: ')+p.n;
+  return '<li class="it'+cls+(dn?' is-done':'')+'" id="it-'+p.id+(opt.k||'')+'">'+
+    '<label class="dchk it-c"><input type="checkbox" data-done="'+p.id+'"'+(dn?' checked':'')+'><span class="box">'+ic('check')+'</span><span class="sr">'+esc(lab)+'</span></label>'+
+    '<button type="button" class="it-h" aria-expanded="false" aria-controls="'+did+'">'+
     '<span class="it-b"><span class="it-n">'+esc(p.n)+'</span>'+sub+'</span>'+
     '<span class="it-r">'+price(p,d)+(icons?'<span class="it-ico">'+icons+'</span>':'')+'</span>'+ic('chev','chev')+
     '</button><div class="it-d" id="'+did+'" data-id="'+p.id+'" hidden></div></li>';
@@ -932,11 +943,12 @@ function renderHoy(){
   /* pasa este día */
   var mo=V.concat(C).filter(function(p){return p.mo&&status(p,d).k!=='closed'});
   mo.sort(function(a,b){return startOf(a,d)-startOf(b,d)});
-  var known=mo.filter(function(p){return startOf(p,d)<9998}), unk=mo.filter(function(p){return startOf(p,d)>=9998});
-  function tm(p){var s=startOf(p,d);if(s===9999)return 'todo';var ws=p.h.filter(function(w){return w[0].indexOf(d)>-1});return ws[0][1]}
-  h+='<section class="sec"><h3 class="sh">'+ic('spark')+'Pasa este día<span class="n">'+mo.length+'</span></h3><ul class="list">'+
-    known.map(function(p){return row(p,d,{time:tm(p),k:'-h'})}).join('')+'</ul>'+
-    (unk.length?'<details class="more sec"><summary>'+ic('clock','sm')+unk.length+' más sin hora confirmada'+ic('chev','chev')+'</summary><ul class="list">'+unk.map(function(p){return row(p,d,{k:'-h'})}).join('')+'</ul></details>':'')+'</section>';
+  var todo=mo.filter(function(p){return !DONE[p.id]}), done=mo.filter(function(p){return DONE[p.id]});
+  var known=todo.filter(function(p){return startOf(p,d)<9998}), unk=todo.filter(function(p){return startOf(p,d)>=9998});
+  h+='<section class="sec"><h3 class="sh">'+ic('spark')+'Pasa este día<span class="n">'+(done.length?done.length+' de ':'')+mo.length+(done.length?' hecho':'')+'</span></h3>'+
+    (known.length?'<ul class="list">'+known.map(function(p){return row(p,d,{k:'-h'})}).join('')+'</ul>':'')+
+    (unk.length?'<details class="more sec"><summary>'+ic('clock','sm')+unk.length+' más sin hora confirmada'+ic('chev','chev')+'</summary><ul class="list">'+unk.map(function(p){return row(p,d,{k:'-h'})}).join('')+'</ul></details>':'')+
+    (done.length?'<p class="gh dh">'+ic('check','xs')+'Hecho</p><ul class="list">'+done.map(function(p){return row(p,d,{k:'-h'})}).join('')+'</ul>':'')+'</section>';
 
   /* cerrado */
   var cl=V.concat(C).filter(function(p){return status(p,d).k==='closed'&&p.id!=='gellert'&&!p.dd&&!p.mo});
@@ -945,7 +957,7 @@ function renderHoy(){
   /* ideas */
   var I=IDEAS[d];
   if(I)h+='<details class="ideas sec"'+(ui.ideas?' open':'')+' id="ideas"><summary>'+ic('bulb')+'Ideas que encajan<span class="n vs">'+I.l.length+'</span>'+ic('chev','chev')+'</summary><p class="zn">'+esc(I.z)+'</p><ul>'+
-    I.l.map(function(id){var p=BY[id];if(!p)return '';return '<li><button type="button" class="jump" data-jump="'+id+'">'+ic(p.i)+'<span>'+esc(p.n)+'</span>'+price(p,d)+'</button></li>'}).join('')+'</ul></details>';
+    I.l.map(function(id){var p=BY[id];if(!p)return '';return '<li><button type="button" class="jump'+(DONE[id]?' is-done':'')+'" data-jump="'+id+'">'+ic(DONE[id]?'check':p.i)+'<span>'+esc(p.n)+(DONE[id]?'<span class="sr"> (hecho)</span>':'')+'</span>'+price(p,d)+'</button></li>'}).join('')+'</ul></details>';
 
   $('#v-hoy').innerHTML=h;
   var idd=$('#ideas'); if(idd)idd.addEventListener('toggle',function(){ui.ideas=idd.open;save('bud26ui2',ui)});
@@ -958,16 +970,17 @@ function renderList(kind){
   var key=isV?'vc':'cc', sel=ui[key]||(isV?'nav':'bar');
   var extra=isV?[['free','Gratis','ticket']]:[];
   $('#'+(isV?'ver':'com')+'-chips').innerHTML=chipsHTML(cats,sel,extra);
-  var hide=!!ui[key+'o'];
-  $('#'+(isV?'ver':'com')+'-open').checked=hide;
-  $('#'+(isV?'ver':'com')+'-open-l').textContent=DAY===30?'Ocultar lo cerrado':'Ocultar lo cerrado el '+dname(DAY);
-  $('#'+(isV?'ver':'com')+'-ctx').textContent=DAY===30?'':'Horarios del '+dshort(DAY);
+  var pre=isV?'ver':'com', hide=!!ui[key+'o'], hideD=!!ui[key+'h'];
+  $('#'+pre+'-open').checked=hide; $('#'+pre+'-done').checked=hideD;
+  $('#'+pre+'-ctx').textContent=DAY===30?'':'Horarios del '+dshort(DAY);
   var items=sel==='free'?data.filter(function(p){return p.pf}):data.filter(function(p){return p.c===sel});
   if(hide)items=items.filter(function(p){return status(p,DAY).k!=='closed'});
+  if(hideD)items=items.filter(function(p){return !DONE[p.id]});
+  items=items.filter(function(p){return !DONE[p.id]}).concat(items.filter(function(p){return DONE[p.id]}));
   var h;
   if(DAY===30)h='<p class="note">'+ic('plane','sm')+'<span>El lunes 30 sales de madrugada: elige otro día arriba para ver horarios.</span></p>';
   else h='';
-  if(!items.length)h+='<p class="empty">Nada abierto con este filtro.</p>';
+  if(!items.length)h+='<p class="empty">Nada con estos filtros.</p>';
   else if(sel==='free'){
     h+=VCATS.map(function(c){var g=items.filter(function(p){return p.c===c[0]});return g.length?'<p class="gh">'+c[1]+'</p><ul class="list">'+g.map(function(p){return row(p,DAY)}).join('')+'</ul>':''}).join('');
   } else h+='<ul class="list">'+items.map(function(p){return row(p,DAY)}).join('')+'</ul>';
@@ -977,6 +990,18 @@ function renderList(kind){
   var key=k==='ver'?'vc':'cc';
   $('#'+k+'-chips').addEventListener('click',function(e){var b=e.target.closest('.chip');if(!b)return;ui[key]=b.dataset.c;save('bud26ui2',ui);renderList(k==='ver'?'ver':'comer');scroller.scrollTop=0});
   $('#'+k+'-open').addEventListener('change',function(e){ui[key+'o']=e.target.checked;save('bud26ui2',ui);renderList(k==='ver'?'ver':'comer')});
+  $('#'+k+'-done').addEventListener('change',function(e){ui[key+'h']=e.target.checked;save('bud26ui2',ui);renderList(k==='ver'?'ver':'comer')});
+});
+/* marcar como hecho: baja al final; al desmarcar vuelve a su sitio */
+var DONE=load('bud26done',{});
+document.addEventListener('change',function(e){
+  var i=e.target; if(!i.matches||!i.matches('input[data-done]'))return;
+  var id=i.dataset.done, li=i.closest('.it'), st=scroller.scrollTop;
+  if(i.checked)DONE[id]=1; else delete DONE[id];
+  save('bud26done',DONE);
+  if(li)li.classList.toggle('is-done',i.checked);
+  setTimeout(function(){renderHoy();renderList('ver');renderList('comer');scroller.scrollTop=st;
+    var back=document.querySelector('#'+(VIEW==='hoy'?'v-hoy':VIEW==='ver'?'ver-list':'com-list')+' input[data-done="'+id+'"]');if(back)back.focus({preventScroll:true})},260);
 });
 
 /* ================= navegación ================= */
@@ -996,7 +1021,7 @@ function scrollTo(el){scroller.scrollTop+=el.getBoundingClientRect().top-scrolle
 function jump(id){
   var p=BY[id]; if(!p)return;
   var v=p.kind==='v'?'ver':'comer', key=p.kind==='v'?'vc':'cc';
-  ui[key]=p.c; ui[key+'o']=false; save('bud26ui2',ui); renderList(v); showView(v);
+  ui[key]=p.c; ui[key+'o']=false; ui[key+'h']=false; save('bud26ui2',ui); renderList(v); showView(v);
   var li=document.getElementById('it-'+id); if(!li)return;
   var b=$('.it-h',li); if(b.getAttribute('aria-expanded')!=='true')b.click();
   scrollTo(li); b.focus({preventScroll:true});
@@ -1092,7 +1117,6 @@ function renderProbar(){
 }
 $('#probar-tabs').addEventListener('click',function(e){var b=e.target.closest('[data-ps]');if(!b)return;PSEL=+b.dataset.ps;ui.ps=PSEL;save('bud26ui2',ui);renderProbar()});
 renderProbar();
-$('#probar-cred').innerHTML=Object.keys(FOTO).map(function(k){return '<a href="https://commons.wikimedia.org/wiki/File:'+encodeURIComponent(FOTO[k].replace(/ /g,'_'))+'" target="_blank" rel="noopener">'+esc(PROBAR.reduce(function(a,g){return a.concat(g[1])},[]).filter(function(x){return x[0]===k})[0][1])+NEW+'</a>'}).join(' · ')+'. Licencias libres; la autoría está en cada enlace. Algunas fotos son del plato hecho en otro país.';
 $('#maleta').innerHTML=MALETA.map(function(g){return '<p class="sub">'+g[0]+(g[2]?' <span class="vs">(no cuenta)</span>':'')+'</p><ul class="cl">'+g[1].map(function(x){return crow(x[0],x[1],x[2])}).join('')+'</ul>'}).join('');
 function counts(){
   var all=PROBAR.reduce(function(a,g){return a.concat(g[1])},[]).map(function(x){return {checked:!!CHK[x[0]]}});
