@@ -1000,9 +1000,34 @@ document.addEventListener('change',function(e){
   if(i.checked)DONE[id]=1; else delete DONE[id];
   save('bud26done',DONE);
   if(li)li.classList.toggle('is-done',i.checked);
-  setTimeout(function(){renderHoy();renderList('ver');renderList('comer');scroller.scrollTop=st;
-    var back=document.querySelector('#'+(VIEW==='hoy'?'v-hoy':VIEW==='ver'?'ver-list':'com-list')+' input[data-done="'+id+'"]');if(back)back.focus({preventScroll:true})},260);
+  var box=VIEW==='hoy'?'v-hoy':VIEW==='ver'?'ver-list':'com-list', moved=li?li.id:null;
+  /* primero se pone en verde (transición CSS) y después se recoloca deslizando */
+  setTimeout(function(){
+    flip(box,moved,function(){
+      renderHoy();renderList('ver');renderList('comer');scroller.scrollTop=st;
+    });
+    var back=document.querySelector('#'+box+' input[data-done="'+id+'"]');if(back)back.focus({preventScroll:true});
+  },reduced()?0:280);
 });
+/* FLIP: mide dónde estaba cada fila, vuelve a pintar y anima desde la posición vieja a la nueva */
+function reduced(){return window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches}
+function flip(boxId,movedId,update){
+  var root=document.getElementById(boxId), before={}, open=[];
+  if(root)Array.prototype.forEach.call(root.querySelectorAll('.it'),function(el){before[el.id]=el.getBoundingClientRect().top;
+    var h=el.querySelector('.it-h[aria-expanded="true"]'); if(h)open.push(el.id)});
+  update();
+  root=document.getElementById(boxId); if(!root)return;
+  open.forEach(function(oid){var el=document.getElementById(oid);if(el){var h=el.querySelector('.it-h');if(h&&h.getAttribute('aria-expanded')!=='true')h.click()}});
+  if(reduced()||!root.animate&&!Element.prototype.animate)return;
+  Array.prototype.forEach.call(root.querySelectorAll('.it'),function(el){
+    var b=before[el.id]; if(b==null)return;
+    var dy=b-el.getBoundingClientRect().top; if(Math.abs(dy)<1)return;
+    var main=el.id===movedId;
+    if(main){el.style.position='relative';el.style.zIndex='2'}
+    var a=el.animate([{transform:'translateY('+dy+'px)'},{transform:'translateY(0)'}],{duration:main?520:380,easing:'cubic-bezier(.2,.8,.2,1)'});
+    if(main)a.onfinish=a.oncancel=function(){el.style.position='';el.style.zIndex=''};
+  });
+}
 
 /* ================= navegación ================= */
 var scroller=$('#scroll'), views=$$('.view'), navBtns=$$('.nb'), VIEW=ui.view||'hoy', pos={};
@@ -1017,6 +1042,12 @@ function renderAll(){renderWhen();renderDays();renderHoy();renderList('ver');ren
 $('#days').addEventListener('click',function(e){var b=e.target.closest('.dbtn');if(!b)return;DAY=+b.dataset.day;ui.day=DAY;save('bud26ui2',ui);renderDays();renderHoy();renderList('ver');renderList('comer');if(VIEW==='hoy')scroller.scrollTop=0});
 
 function scrollTo(el){scroller.scrollTop+=el.getBoundingClientRect().top-scroller.getBoundingClientRect().top-12}
+/* acordeones de un solo abierto: al cerrarse el de arriba, el que tocas no se mueve de debajo del dedo */
+document.addEventListener('click',function(e){
+  var s=e.target.closest('details[name] > summary'); if(!s)return;
+  var top=s.getBoundingClientRect().top;
+  requestAnimationFrame(function(){var d=s.getBoundingClientRect().top-top; if(Math.abs(d)>1)scroller.scrollTop+=d});
+});
 /* saltar desde Hoy a un sitio */
 function jump(id){
   var p=BY[id]; if(!p)return;
