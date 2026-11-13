@@ -117,6 +117,7 @@ ul,ol{margin:0;padding:0;list-style:none}
 .chips::-webkit-scrollbar{display:none}
 .chip{flex:none;display:inline-flex;align-items:center;gap:6px;height:40px;padding:0 var(--s4);border:0;border-radius:var(--rp);background:var(--pill);font-weight:600;font-size:var(--f2);color:var(--ink)}
 .chip[aria-pressed=true]{background:var(--primary-ink);color:var(--on-primary)}
+.chip[aria-pressed=true] .vs{color:var(--on-primary)}
 .chip .ic{color:inherit}
 .switch{display:flex;align-items:center;gap:var(--s3);font-size:var(--f2);color:var(--muted);margin:0 0 var(--s3);cursor:pointer;min-height:32px}
 .switch input{position:absolute;opacity:0;width:1px;height:1px}
@@ -235,6 +236,27 @@ ul,ol{margin:0;padding:0;list-style:none}
 .ct small{display:block;font-size:var(--f2);color:var(--muted)}
 .pw{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0 0 36px;padding-bottom:var(--s2)}
 .pw a{display:inline-flex;align-items:center;gap:4px;min-height:32px;padding:0 10px;border-radius:var(--rp);background:var(--screen);color:var(--primary-ink);font-size:var(--f1);font-weight:700;text-decoration:none}
+
+.dsec{margin:var(--s4) 0 0!important;padding:0 0 var(--s1)}
+.say{display:flex;gap:var(--s2);align-items:flex-start;font-size:var(--f2);color:var(--muted);margin:0 0 var(--s3)}
+.say .ic{margin-top:1px;color:var(--primary-ink)}
+.say b{color:var(--ink)}
+.dish{display:flex;gap:var(--s3);align-items:flex-start;padding:var(--s3) 0}
+.dish img{flex:none;width:76px;height:76px;border-radius:var(--r2);object-fit:cover;background:var(--pill)}
+.dish-b{flex:1;min-width:0}
+.dish-n{font-family:var(--display);font-weight:800;font-size:var(--f4);line-height:1.2}
+.dish-p{font-size:var(--f2);color:var(--primary-ink);font-weight:700}
+.dish-e{font-size:var(--f2);font-weight:700;margin-top:2px}
+.dish-d{font-size:var(--f2);color:var(--muted);margin-top:2px}
+.dish .pw{margin:6px 0 0;padding:0}
+.dchk{position:relative;flex:none;width:44px;height:44px;display:grid;place-items:center;margin:-6px -8px 0 0;cursor:pointer}
+.dchk input{position:absolute;inset:0;width:100%;height:100%;margin:0;opacity:0;cursor:pointer}
+.dchk input:checked ~ .box{background:var(--primary-ink);border-color:var(--primary-ink)}
+.dchk input:checked ~ .box .ic{opacity:1}
+.dchk input:focus-visible ~ .box{outline:3px solid var(--primary-ink);outline-offset:2px}
+.dish:has(input:checked) .dish-n{text-decoration:line-through;color:var(--muted)}
+.dish:has(input:checked) img{opacity:.55}
+.cred{padding-top:var(--s2)}
 
 /* ---------- barra inferior ---------- */
 .dock{position:absolute;left:var(--s4);right:var(--s4);bottom:14px;bottom:calc(14px + env(safe-area-inset-bottom));height:64px;border-radius:32px;background:var(--dock);
@@ -372,8 +394,12 @@ ul,ol{margin:0;padding:0;list-style:none}
         </dl>
 
         <details class="acc" name="g" id="g-probar">
-          <summary><svg class="ic"><use href="#i-food"/></svg><h3>Qué probar</h3><span class="cnt" data-count="probar"></span><svg class="ic chev"><use href="#i-chev"/></svg></summary>
-          <div class="accb"><div class="bar" aria-hidden="true"><i data-bar="probar"></i></div><ul class="cl" id="probar"></ul></div>
+          <summary><svg class="ic"><use href="#i-food"/></svg><h3>Carta: qué probar</h3><span class="cnt" data-count="probar"></span><svg class="ic chev"><use href="#i-chev"/></svg></summary>
+          <div class="accb"><div class="bar" aria-hidden="true"><i data-bar="probar"></i></div>
+            <p class="say"><svg class="ic sm"><use href="#i-info"/></svg><span>La fuerza va siempre en la primera sílaba. La <b>s</b> suena «sh», la <b>sz</b> suena «s» y la <b>a</b> casi como una «o».</span></p>
+            <div class="chips" id="probar-tabs" role="group" aria-label="Parte de la carta"></div>
+            <ul class="cl" id="probar"></ul>
+            <details class="more"><summary><svg class="ic sm"><use href="#i-link"/></svg>Fotos: Wikimedia Commons<svg class="ic chev"><use href="#i-chev"/></svg></summary><p id="probar-cred"></p></details></div>
         </details>
 
         <details class="acc" name="g" id="g-maleta">
@@ -1018,30 +1044,32 @@ $('#rs-del').addEventListener('click',function(){if(!editing)return;RES=RES.filt
 var CHK=load('bud26chk',{});
 var PROBAR=[
  ['Primeros platos',[
-  ['gulyas','Gulyásleves','Sopa de gulash: ternera, pimentón, patata y zanahoria. Es sopa, no estofado.',['Mama Goulash','Gettó Gulyás','Frici Papa','Gundel']],
-  ['halaszle','Halászlé','Sopa roja y picante de pescado de río. Pídela donde la veas.',[]],
-  ['gombaleves','Gombaleves','Sopa cremosa de champiñones con crema agria.',['Kisharang Étkezde']]]],
+  ['gulyas','Gulyásleves','gú-yash-le-vesh','Sopa de gulash','Ternera, pimentón, patata y zanahoria. Es sopa, no estofado.',['Mama Goulash','Gettó Gulyás','Frici Papa','Gundel']],
+  ['halaszle','Halászlé','jó-las-le','Sopa de pescado','Roja y picante, de pescado de río. Pídela donde la veas.',[]],
+  ['gombaleves','Gombaleves','góm-bo-le-vesh','Sopa de champiñones','Cremosa, con pimentón y crema agria.',['Kisharang Étkezde']]]],
  ['Principales',[
-  ['paprikas','Csirkepaprikás','Pollo al pimentón con nokedli (ñoquis húngaros).',['Frici Papa','Café Kör','Kisharang Étkezde']],
-  ['porkolt','Pörkölt','Estofado de carne con cebolla y pimentón.',['Gettó Gulyás','Frici Papa','Fekete Holló']],
-  ['hortobagyi','Hortobágyi palacsinta','Crepe salado de carne con salsa de pimentón.',['Retek Bisztro']],
-  ['pato','Kacsa és liba','Pato y ganso, muy de invierno.',['Fuego','Café Kör']]]],
+  ['paprikas','Csirkepaprikás','chír-ke-po-pri-kash','Pollo al pimentón','Guisado en salsa de pimentón y crema agria, con nokedli (ñoquis).',['Frici Papa','Café Kör','Kisharang Étkezde']],
+  ['porkolt','Pörkölt','pér-kelt','Estofado de carne','Ternera o cerdo con cebolla y pimentón, con nokedli.',['Gettó Gulyás','Frici Papa','Fekete Holló']],
+  ['hortobagyi','Hortobágyi palacsinta','jór-to-ba-dyi pó-lo-chin-to','Crepe salado de carne','Relleno de carne, con salsa de pimentón.',['Retek Bisztro']],
+  ['pato','Kacsa és liba','kó-cho eish lí-bo','Pato y ganso','Muy de invierno, con lombarda y patata.',['Fuego','Café Kör']]]],
  ['De calle',[
-  ['langos','Lángos','Masa frita con crema agria, queso y ajo.',['Retro Lángos','Langos Papi']],
-  ['kurtos','Kürtőskalács','Pastel chimenea asado sobre brasas, con azúcar y canela.',['Mercadillo de Vörösmarty tér']]]],
+  ['langos','Lángos','lán-gosh','Masa frita','Con crema agria, queso y ajo. Es enorme: compártelo.',['Retro Lángos','Langos Papi']],
+  ['kurtos','Kürtőskalács','kúr-tesh-ko-lach','Pastel chimenea','Masa dulce asada sobre brasas, con azúcar y canela.',['Mercadillo de Vörösmarty tér']]]],
  ['Postres',[
-  ['somloi','Somlói galuska','Bizcocho con crema, chocolate, nueces y ron.',['Stand25 Bistro']],
-  ['dobos','Dobos torta','Capas de bizcocho y chocolate con caramelo duro.',['New York Café']],
-  ['turo','Túrógombóc','Bolas de requesón con migas y crema agria.',['Gettó Gulyás']],
-  ['gundelp','Gundel palacsinta','Crepe de nueces con chocolate y ron.',['Gundel']],
-  ['retes','Rétes','Strudel de manzana, cuajada o amapola. En pastelerías.',[]]]],
+  ['somloi','Somlói galuska','shóm-lo-i gó-lush-ko','Bizcocho Somló','Con crema, chocolate, nueces, ron y nata.',['Stand25 Bistro']],
+  ['dobos','Dobos torta','dó-bosh tór-to','Tarta Dobos','Capas de bizcocho y chocolate con caramelo duro.',['New York Café']],
+  ['turo','Túrógombóc','tú-ro-góm-bots','Bolas de requesón','Con migas de pan y crema agria.',['Gettó Gulyás']],
+  ['gundelp','Gundel palacsinta','gún-del pó-lo-chin-to','Crepe Gundel','Relleno de nueces, con chocolate y ron.',['Gundel']],
+  ['retes','Rétes','ré-tesh','Strudel','De manzana, cuajada o semillas de amapola. En pastelerías.',[]]]],
  ['Para beber',[
-  ['forralt','Forralt bor','Vino caliente especiado de los mercadillos.',['Kiosk']],
-  ['palinka','Pálinka','Aguardiente de ciruela, albaricoque o pera.',['Dobló Wine Bar']],
-  ['vinos','Tokaji y Egri Bikavér','Vino dulce de Tokaj y tinto de Eger.',['St. Andrea Wine & Skybar','Cabrio']],
-  ['cerveza','Cerveza artesana','Para probar varias en un sitio.',['Élesztőház']],
-  ['unicum','Unicum','Licor amargo de hierbas, de digestivo.',[]]]]
+  ['forralt','Forralt bor','fó-rrolt bor','Vino caliente','Especiado, el de los mercadillos.',['Kiosk']],
+  ['palinka','Pálinka','pá-lin-ko','Aguardiente de fruta','De ciruela, albaricoque o pera.',['Dobló Wine Bar']],
+  ['vinos','Tokaji y Egri Bikavér','tó-ko-yi · ég-ri bí-ko-ver','Vino dulce y tinto','El Tokaji es dulce; el Bikavér, tinto de Eger.',['St. Andrea Wine & Skybar','Cabrio']],
+  ['cerveza','Kézműves sör','kéis-mi-vesh sher','Cerveza artesana','Para probar varias en un mismo sitio.',['Élesztőház']],
+  ['unicum','Unicum','ú-ni-kum','Licor de hierbas','Amargo, de digestivo.',[]]]]
 ];
+/* fotos de Wikimedia Commons, guardadas en img/platos (330 px) */
+var FOTO={gulyas:'Gulyas080.jpg',halaszle:"Pot_of_Hungarian_Fisherman's_Soup_(Halászlé,_Karpfensuppe).jpg",gombaleves:'Cream_mushroom_soup_3.jpg',paprikas:'Chicken_Paprikash_(Csirke_Paprikás).jpg',porkolt:'2009-09-gulasch-pörkölt-paprikas-1.jpg',hortobagyi:'Hortobagy_palacsinta.JPG',pato:'034_Polish_cuisine,_Silesian_cuisine_-_Duck_leg_with_Silesian_dumplings,_red_cabbage.jpg',langos:'Langos_Eger_Hungary.jpg',kurtos:'Kürtőskalács2011.jpg',somloi:'Somlói_galuska.jpg',dobos:'Dobos_cake_(Gerbeaud_Confectionery_Budapest_Hungary).jpg',turo:'Túrógombóc.jpg',gundelp:'Gundel_Palacsinta_at_Gundel.jpg',retes:'Strudel.jpg',forralt:'Glühwein_Weinnachtsmarkt_OS.JPG',palinka:'Sopron_barack_07.JPG',vinos:'Szent_Tamás_Szamorodni_2013.jpg',cerveza:'Budapest_IPA_(50227692663).jpg',unicum:'Unicumbottle.png'};
 var MALETA=[
  ['Ropa',[['pc0','Abrigo grueso o plumas','esperarás de noche y saldrás a las 02:15'],['pc1','Capas: jersey, forro polar y camiseta térmica'],['pc2','Gorro, bufanda y guantes'],['pc3','Calzado cerrado e impermeable','cuestas, adoquines y escaleras'],['pc4','Calcetines de abrigo de repuesto'],['pc5','Paraguas pequeño o chubasquero']]],
  ['Termas',[['pb0','Bañador','mejor no blanco: el agua termal puede teñirlo'],['pb1','Chanclas','obligatorias fuera de las piscinas'],['pb2','Toalla grande','alquilarla cuesta más de 1.500 Ft'],['pb3','Bolsa para lo mojado'],['pb4','Gel y champú pequeños'],['pb6','Funda estanca para el móvil'],['pb7','Gorro de lana para la piscina exterior']]],
@@ -1049,18 +1077,32 @@ var MALETA=[
  ['Solo si vas a',[['po0','Ópera: informal elegante'],['po1','Sinagoga: hombros y rodillas cubiertos'],['po2','Crucero o colina: cortavientos'],['po3','Cena a bordo: algo más arreglado']],1]
 ];
 function crow(k,t,s,extra){return '<li><label class="cr"><input type="checkbox" data-c="'+k+'"'+(CHK[k]?' checked':'')+'><span class="box">'+ic('check')+'</span><span class="ct">'+esc(t)+(s?'<small>'+esc(s)+'</small>':'')+'</span></label>'+(extra||'')+'</li>'}
-$('#probar').innerHTML=PROBAR.map(function(g){return '<li class="sub" aria-hidden="true" style="border:0">'+g[0]+'</li>'+g[1].map(function(x){
-  var w=x[3].map(function(n){var p=null;V.concat(C).forEach(function(q){if(q.n===n)p=q});return p&&p.m?'<a href="'+map(p.m)+'" target="_blank" rel="noopener">'+ic('pin','xs')+esc(n)+NEW+'</a>':''}).join('');
-  return crow(x[0],x[1],x[2],w?'<div class="pw">'+w+'</div>':'')}).join('')}).join('');
+function where(names){return names.map(function(n){var p=null;V.concat(C).forEach(function(q){if(q.n===n)p=q});return p&&p.m?'<a href="'+map(p.m)+'" target="_blank" rel="noopener">'+ic('pin','xs')+esc(n)+NEW+'</a>':''}).join('')}
+var PSEL=ui.ps||0;
+function dish(x){
+  var w=where(x[5]), img=(x[0]==='unicum'?'unicum.png':x[0]+'.jpg');
+  return '<li class="dish"><img src="img/platos/'+img+'" alt="" loading="lazy" width="76" height="76">'+
+   '<div class="dish-b"><p class="dish-n">'+esc(x[1])+'</p><p class="dish-p">('+esc(x[2])+')</p><p class="dish-e">'+esc(x[3])+'</p><p class="dish-d">'+esc(x[4])+'</p>'+(w?'<div class="pw">'+w+'</div>':'')+'</div>'+
+   '<label class="dchk"><input type="checkbox" data-c="'+x[0]+'"'+(CHK[x[0]]?' checked':'')+'><span class="box">'+ic('check')+'</span><span class="sr">Probado: '+esc(x[1])+'</span></label></li>'}
+function tabCount(g){return g[1].filter(function(x){return CHK[x[0]]}).length+'/'+g[1].length}
+function renderProbar(){
+  $('#probar-tabs').innerHTML=PROBAR.map(function(g,i){return '<button type="button" class="chip" data-ps="'+i+'" aria-pressed="'+(i===PSEL)+'">'+g[0]+' <span class="vs">'+tabCount(g)+'</span></button>'}).join('');
+  $('#probar').innerHTML=PROBAR[PSEL][1].map(dish).join('');
+  var row=$('#probar-tabs'), on=$('[aria-pressed="true"]',row); if(on)row.scrollLeft=on.offsetLeft-row.offsetLeft-16;
+}
+$('#probar-tabs').addEventListener('click',function(e){var b=e.target.closest('[data-ps]');if(!b)return;PSEL=+b.dataset.ps;ui.ps=PSEL;save('bud26ui2',ui);renderProbar()});
+renderProbar();
+$('#probar-cred').innerHTML=Object.keys(FOTO).map(function(k){return '<a href="https://commons.wikimedia.org/wiki/File:'+encodeURIComponent(FOTO[k].replace(/ /g,'_'))+'" target="_blank" rel="noopener">'+esc(PROBAR.reduce(function(a,g){return a.concat(g[1])},[]).filter(function(x){return x[0]===k})[0][1])+NEW+'</a>'}).join(' · ')+'. Licencias libres; la autoría está en cada enlace. Algunas fotos son del plato hecho en otro país.';
 $('#maleta').innerHTML=MALETA.map(function(g){return '<p class="sub">'+g[0]+(g[2]?' <span class="vs">(no cuenta)</span>':'')+'</p><ul class="cl">'+g[1].map(function(x){return crow(x[0],x[1],x[2])}).join('')+'</ul>'}).join('');
 function counts(){
-  [['probar',$$('#probar input')],['maleta',$$('#maleta input').filter(function(i){return i.dataset.c.indexOf('po')!==0})]].forEach(function(a){
+  var all=PROBAR.reduce(function(a,g){return a.concat(g[1])},[]).map(function(x){return {checked:!!CHK[x[0]]}});
+  [['probar',all],['maleta',$$('#maleta input').filter(function(i){return i.dataset.c.indexOf('po')!==0})]].forEach(function(a){
     var n=a[1].filter(function(i){return i.checked}).length;
     $('[data-count="'+a[0]+'"]').textContent=n+'/'+a[1].length;
     $('[data-bar="'+a[0]+'"]').style.width=(a[1].length?n/a[1].length*100:0)+'%';
   });
 }
-document.addEventListener('change',function(e){var i=e.target;if(!i.matches||!i.matches('input[data-c]'))return;CHK[i.dataset.c]=i.checked;save('bud26chk',CHK);counts()});
+document.addEventListener('change',function(e){var i=e.target;if(!i.matches||!i.matches('input[data-c]'))return;CHK[i.dataset.c]=i.checked;save('bud26chk',CHK);counts();if(i.closest('#probar'))$$('#probar-tabs .vs').forEach(function(v,k){v.textContent=tabCount(PROBAR[k])})});
 counts();
 
 /* ================= arranque ================= */
