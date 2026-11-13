@@ -115,6 +115,8 @@ ul,ol{margin:0;padding:0;list-style:none}
 .btn.ghost{background:none;padding:0 var(--s2);color:var(--muted)}
 .chips{display:flex;gap:var(--s2);overflow-x:auto;margin:0 calc(var(--s4) * -1) var(--s3);padding:2px var(--s4);scrollbar-width:none}
 .chips::-webkit-scrollbar{display:none}
+@media (hover:hover) and (pointer:fine){.chips{cursor:grab}.chips.drag{cursor:grabbing;user-select:none}}
+.fh{font-size:var(--f1);color:var(--muted);margin-top:4px}
 .chip{flex:none;display:inline-flex;align-items:center;gap:6px;height:40px;padding:0 var(--s4);border:0;border-radius:var(--rp);background:var(--pill);font-weight:600;font-size:var(--f2);color:var(--ink)}
 .chip[aria-pressed=true]{background:var(--primary-ink);color:var(--on-primary)}
 .chip[aria-pressed=true] .vs{color:var(--on-primary)}
@@ -517,7 +519,6 @@ details.closing > summary .chev{transform:none!important}
           </div>
         </details>
 
-        <p class="foot">Horarios, precios y formas de pago de webs y guías consultadas en noviembre de 2026. Lo marcado con «confirmar» conviene mirarlo antes de ir. Los enlaces de mapa abren la búsqueda en Google Maps. Fotos de platos: <a class="lk" href="https://commons.wikimedia.org" target="_blank" rel="noopener">Wikimedia Commons<span class="sr"> (se abre en una pestaña nueva)</span></a>, licencias libres.</p>
       </div>
     </main>
 
@@ -547,6 +548,9 @@ details.closing > summary .chev{transform:none!important}
           <div class="chips" id="rs-day" role="group" aria-labelledby="rs-dl2"></div>
           <label class="fl" for="rs-time">Hora</label>
           <input class="fi" id="rs-time" type="time" value="20:00">
+          <label class="fl" for="rs-url">Enlace (opcional)</label>
+          <input class="fi" id="rs-url" type="url" inputmode="url" autocomplete="off" placeholder="Pega el enlace de Maps o de la reserva" aria-describedby="rs-url-h">
+          <p class="fh" id="rs-url-h">Si es de Google Maps, el botón del mapa abrirá ese sitio exacto.</p>
           <label class="fl" for="rs-note">Nota (opcional)</label>
           <input class="fi" id="rs-note" autocomplete="off" placeholder="A nombre de…, nº de reserva, personas">
           <div class="row">
@@ -913,7 +917,10 @@ function slide(el,a,b,done){
 var RES=load('bud26res',[]);
 var TYPES={rest:['Restaurante','food'],ter:['Termas','bath'],otra:['Reserva','ticket']};
 function resFix(d){return RES.filter(function(r){return r.d===d}).map(function(r,i){var p=null;V.concat(C).forEach(function(x){if(x.n===r.n)p=x});
-  return {t:r.t||'',i:TYPES[r.ty][1],n:r.n||TYPES[r.ty][0],s:(TYPES[r.ty][0]+(r.note?' · '+r.note:'')),m:p&&p.m?p.m:(r.n?r.n+', Budapest':null),tag:'Reservado',rid:r.id,res:1}})}
+  return {t:r.t||'',i:TYPES[r.ty][1],n:r.n||TYPES[r.ty][0],s:(TYPES[r.ty][0]+(r.note?' · '+r.note:'')),m:p&&p.m?p.m:(r.n?r.n+', Budapest':null),url:r.url||'',tag:'Reservado',rid:r.id,res:1}})}
+/* un enlace de Google Maps sustituye a la búsqueda; cualquier otro va en su propio botón */
+function isMapUrl(u){return /(^|\/\/|\.)((maps\.app\.goo\.gl)|(goo\.gl\/maps)|(google\.[a-z.]+\/maps)|(maps\.google\.))/i.test(u)}
+function cleanUrl(u){u=(u||'').trim(); if(!u)return ''; if(!/^https?:\/\//i.test(u))u='https://'+u; try{var x=new URL(u);return /^https?:$/.test(x.protocol)?x.href:''}catch(e){return ''}}
 
 /* ================= HOY ================= */
 var DAY, ui=load('bud26ui2',{});
@@ -944,7 +951,10 @@ function renderHoy(){
   if(!fx.length)h+='<p class="empty">Nada fijo: día para elegir sobre la marcha.</p>';
   else h+='<ol class="fix">'+fx.map(function(x){
     var a='';
-    if(x.m)a+='<a class="ib" href="'+map(x.m)+'" target="_blank" rel="noopener" aria-label="Mapa de '+esc(x.n)+' (se abre en una pestaña nueva)">'+ic('pin','sm')+'</a>';
+    var mu=x.url&&isMapUrl(x.url);
+    if(mu)a+='<a class="ib" href="'+esc(x.url)+'" target="_blank" rel="noopener" aria-label="Mapa de '+esc(x.n)+' (tu enlace, se abre en una pestaña nueva)">'+ic('pin','sm')+'</a>';
+    else if(x.m)a+='<a class="ib" href="'+map(x.m)+'" target="_blank" rel="noopener" aria-label="Mapa de '+esc(x.n)+' (se abre en una pestaña nueva)">'+ic('pin','sm')+'</a>';
+    if(x.url&&!mu)a+='<a class="ib" href="'+esc(x.url)+'" target="_blank" rel="noopener" aria-label="Enlace de '+esc(x.n)+' (se abre en una pestaña nueva)">'+ic('ext','sm')+'</a>';
     if(x.g)a+='<button type="button" class="ib" data-guide="'+x.g+'" aria-label="Cómo funciona el bus">'+ic('info','sm')+'</button>';
     if(x.rid)a+='<button type="button" class="ib" data-edit="'+x.rid+'" aria-label="Editar reserva">'+ic('note','sm')+'</button>';
     return '<li class="fx"><span class="fx-t">'+esc(x.t||'')+'</span><div class="fx-c'+(x.res?' res':'')+'">'+ic(x.i)+'<div class="fx-b"><p class="fx-n">'+esc(x.n)+'</p><p class="fx-s">'+esc(x.s)+'</p>'+
@@ -1063,6 +1073,20 @@ $('#days').addEventListener('click',function(e){var b=e.target.closest('.dbtn');
 function scrollTo(el){scroller.scrollTop+=el.getBoundingClientRect().top-scroller.getBoundingClientRect().top-12}
 /* acordeones: se abren y se cierran deslizando. Si es de los de «uno abierto a la vez»,
    el que estaba abierto se cierra a la vez y el que tocas se queda quieto bajo el dedo. */
+/* filas de pestañas en escritorio: arrastrar con el ratón y rueda en horizontal */
+Array.prototype.forEach.call(document.querySelectorAll('.chips'),function(row){
+  var down=false,moved=false,x0=0,l0=0;
+  row.addEventListener('pointerdown',function(e){if(e.pointerType!=='mouse'||e.button!==0)return;down=true;moved=false;x0=e.clientX;l0=row.scrollLeft});
+  window.addEventListener('pointermove',function(e){if(!down)return;var dx=e.clientX-x0;if(!moved&&Math.abs(dx)>5){moved=true;row.classList.add('drag')}if(moved)row.scrollLeft=l0-dx});
+  window.addEventListener('pointerup',function(){if(!down)return;down=false;row.classList.remove('drag')});
+  row.addEventListener('click',function(e){if(moved){e.preventDefault();e.stopPropagation();moved=false}},true);
+  row.addEventListener('wheel',function(e){
+    if(Math.abs(e.deltaY)<=Math.abs(e.deltaX)||row.scrollWidth<=row.clientWidth)return;
+    var max=row.scrollWidth-row.clientWidth;
+    if((e.deltaY>0&&row.scrollLeft>=max-1)||(e.deltaY<0&&row.scrollLeft<=0))return;
+    e.preventDefault(); row.scrollLeft=Math.max(0,Math.min(max,row.scrollLeft+e.deltaY));
+  },{passive:false});
+});
 var ACC='details.acc,details.ideas,details.more';
 function accClose(d,done){
   d.classList.add('closing');
@@ -1116,7 +1140,7 @@ function openRes(r,from){
   editing=r.id?r:null; lastFocus=from||document.activeElement;
   rtype=r.ty||'rest'; rday=r.d||(DAY<30?DAY:25);
   $('#rs-t').textContent=editing?'Editar reserva':'Nueva reserva';
-  $('#rs-name').value=r.n||''; $('#rs-time').value=r.t||(rtype==='ter'?'10:00':'20:00'); $('#rs-note').value=r.note||'';
+  $('#rs-name').value=r.n||''; $('#rs-time').value=r.t||(rtype==='ter'?'10:00':'20:00'); $('#rs-note').value=r.note||''; $('#rs-url').value=r.url||'';
   $('#rs-del').hidden=!editing;
   setPressed($('#rs-type'),'v',rtype); setPressed($('#rs-day'),'d',rday); fillList();
   rs.classList.add('open'); rs.setAttribute('aria-hidden','false');
@@ -1129,7 +1153,7 @@ $$('[data-close]',rs).forEach(function(b){b.addEventListener('click',closeRes)})
 rs.addEventListener('keydown',function(e){if(e.key==='Escape')closeRes()});
 rf.addEventListener('submit',function(e){
   e.preventDefault();
-  var r={id:editing?editing.id:'r'+Date.now(),ty:rtype,n:$('#rs-name').value.trim(),d:rday,t:$('#rs-time').value,note:$('#rs-note').value.trim()};
+  var r={id:editing?editing.id:'r'+Date.now(),ty:rtype,n:$('#rs-name').value.trim(),d:rday,t:$('#rs-time').value,note:$('#rs-note').value.trim(),url:cleanUrl($('#rs-url').value)};
   if(editing)RES=RES.map(function(x){return x.id===r.id?r:x});else RES.push(r);
   save('bud26res',RES); DAY=rday; ui.day=DAY; save('bud26ui2',ui); closeRes(); renderAll(); showView('hoy');
 });
