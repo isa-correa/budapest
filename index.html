@@ -355,9 +355,9 @@ p{margin:0}
   function canMove(){return ready&&window.gsap&&!rmq.matches}
   function enter(root){
     if(!canMove()||!root)return;
-    var els=$$('.soft,.acc',root).slice(0,8);
+    var els=$$('.soft,.acc',root).slice(0,5);
     if(!els.length)return;
-    gsap.from(els,{autoAlpha:0,y:10,duration:.3,ease:'power2.out',stagger:.045,overwrite:'auto',clearProps:'opacity,visibility,transform'});
+    gsap.from(els,{autoAlpha:0,y:6,duration:.2,ease:'power2.out',stagger:.03,overwrite:'auto',clearProps:'opacity,visibility,transform'});
   }
   function pop(box){
     if(!canMove()||!box)return;
@@ -419,10 +419,12 @@ p{margin:0}
   });
 
   /* ---- días ---- */
+  var dpos={}, vpos={};
   function showDay(id,anim){
     var from=current?dayBtns.findIndex(function(b){return b.dataset.day===current}):-1;
     var to=dayBtns.findIndex(function(b){return b.dataset.day===id});
     if(to<0)return;
+    if(current)dpos[current]=scroller.scrollTop;
     current=id; ui.day=id; saveUi();
     dayBtns.forEach(function(b){var on=b.dataset.day===id;b.setAttribute('aria-selected',on?'true':'false');b.tabIndex=on?0:-1});
     panels.forEach(function(p){
@@ -430,8 +432,8 @@ p{margin:0}
       p.classList.remove('in-l','in-r');
       if(on&&anim&&from>=0&&from!==to){p.classList.add(to>from?'in-r':'in-l')}
     });
-    scroller.scrollTop=0;
     measure($('#p-'+id));
+    scroller.scrollTop=dpos[id]||0;
   }
   dayBtns.forEach(function(b,i){
     b.addEventListener('click',function(){showDay(b.dataset.day,true)});
@@ -460,6 +462,7 @@ p{margin:0}
     var cur=views.filter(function(x){return !x.hidden})[0], next=$('[data-view="'+v+'"]');
     navBtns.forEach(function(b){if(b.dataset.view===v)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current')});
     ui.view=v; saveUi();
+    if(cur&&cur!==next)vpos[cur.dataset.view]=scroller.scrollTop;
     if(canMove()){
       gsap.killTweensOf(views);
       views.forEach(function(x){gsap.set(x,{clearProps:'opacity,visibility,transform'})});
@@ -469,16 +472,14 @@ p{margin:0}
     function swap(){
       views.forEach(function(x){x.hidden=x.dataset.view!==v});
       daysBar.hidden=(v!=='plan');
-      scroller.scrollTop=0;
       if(v==='plan')measure($('#p-'+current));
+      scroller.scrollTop=(cur&&cur===next)?scroller.scrollTop:(vpos[v]||0);
     }
     if(!canMove()||!cur||cur===next){swap();return}
-    var dir=order.indexOf(v)>order.indexOf(cur.dataset.view)?1:-1;
-    gsap.to(cur,{autoAlpha:0,x:-14*dir,duration:.12,ease:'power1.in',onComplete:function(){
+    gsap.to(cur,{autoAlpha:0,duration:.08,ease:'none',onComplete:function(){
       gsap.set(cur,{clearProps:'opacity,visibility,transform'});
       swap();
-      gsap.fromTo(next,{autoAlpha:0,x:16*dir},{autoAlpha:1,x:0,duration:.26,ease:'power2.out',clearProps:'opacity,visibility,transform'});
-      enter(next);
+      gsap.fromTo(next,{autoAlpha:0},{autoAlpha:1,duration:.18,ease:'power1.out',clearProps:'opacity,visibility'});
     }});
   }
   navBtns.forEach(function(b){b.addEventListener('click',function(){showView(b.dataset.view)})});
@@ -490,7 +491,6 @@ p{margin:0}
       c.addEventListener('click',function(){
         chips.forEach(function(x){x.setAttribute('aria-pressed',x===c?'true':'false')});
         $$('[data-group="'+group+'"]').forEach(function(p){p.hidden=p.id!==c.dataset.panel});
-        scroller.scrollTop=0;
         enter($('#'+c.dataset.panel));
       });
     });
@@ -561,7 +561,6 @@ p{margin:0}
       if(f.some(function(x){return prices.indexOf(x)>-1}))notes.push('El precio es orientativo por persona; los sitios sin precio no salen.');
       stat.textContent=hit.length+' de '+places.length+' sitios. '+notes.join(' ');
       stat.hidden=false;
-      scroller.scrollTop=0;
       enter(res);
     }
     btns.forEach(function(b){
