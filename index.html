@@ -70,7 +70,7 @@ ul,ol{margin:0;padding:0;list-style:none}
 .dbtn.today .dn{text-decoration:underline;text-underline-offset:3px}
 
 /* ---------- zona con scroll ---------- */
-.scroll{flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;padding:var(--s4) var(--s4) 112px}
+.scroll{flex:1;min-height:0;overflow-y:auto;overflow-anchor:none;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;padding:var(--s4) var(--s4) 112px}
 .view[hidden]{display:none}
 .vh{display:flex;align-items:baseline;justify-content:space-between;gap:var(--s3);margin:0 0 var(--s3)}
 .vt{font-family:var(--display);font-weight:800;font-size:var(--f7);line-height:1.05}
@@ -103,7 +103,7 @@ ul,ol{margin:0;padding:0;list-style:none}
 .ib{width:40px;height:40px;border:0;border-radius:50%;background:var(--screen);color:var(--primary-ink);display:grid;place-items:center;text-decoration:none}
 
 /* por reservar */
-.pend{border:1.5px dashed var(--ring);border-radius:var(--r3);padding:var(--s3) var(--s4);margin:0 0 var(--s3)}
+.pend{border:1.5px dashed var(--ring);border-radius:var(--r3);padding:var(--s3) var(--s4);margin:var(--s5) 0 var(--s3)}
 .pend p{font-size:var(--f2);color:var(--muted);margin-bottom:var(--s2)}
 .pend p b{color:var(--ink)}
 .pend .row{display:flex;flex-wrap:nowrap;gap:var(--s2)}
@@ -213,6 +213,8 @@ ul,ol{margin:0;padding:0;list-style:none}
 .acc h3{flex:1;font-size:var(--f4);font-weight:700}
 .acc .cnt{font-size:var(--f2);color:var(--muted);font-variant-numeric:tabular-nums}
 .acc[open] > summary .chev{transform:rotate(180deg)}
+.acc > summary .chev,.ideas > summary .chev{transition:transform .25s}
+details.closing > summary .chev{transform:none!important}
 .accb{padding:0 var(--s4) var(--s4)}
 .kv{margin:0 0 var(--s3)}
 .kv div{display:flex;justify-content:space-between;align-items:baseline;gap:var(--s4);padding:var(--s2) 0;font-size:var(--f2)}
@@ -583,7 +585,7 @@ function mn(s){var a=s.split(':');return +a[0]*60+ +a[1]}
 var HOTEL='Andrássy Thai Hotel, Andrássy út 2, Budapest', AIR='Budapest Liszt Ferenc International Airport', DEAK='Deák Ferenc tér, Budapest', PARL='Hungarian Parliament Building, Budapest';
 var FIX={
  25:[{t:'13:15',i:'plane',n:'Aterrizas en Budapest (BUD)',s:'Schengen, sin pasaportes. Unos 30 min hasta tener maletas.',m:AIR},
-     {t:'14:00',i:'bus',n:'Bus 100E hasta Deák Ferenc tér',s:'40 min · 2.500 Ft (≈ 6 €) en BudapestGO',m:DEAK,g:'g-bus'},
+     {t:'14:00',i:'bus',n:'Bus 100E hasta Deák Ferenc tér',s:'40 min · 6 € (2.500 Ft) en BudapestGO',m:DEAK,g:'g-bus'},
      {t:'15:00',i:'bed',n:'Check-in en el hotel',s:'Andrássy út 2 · desde las 14:00 · recepción 24 h',m:HOTEL}],
  29:[{t:'12:00',i:'shield',n:'Control de seguridad del Parlamento',s:'Kossuth Lajos tér 1-3. Lleva la entrada y el DNI. Metro M2 desde Astoria o 25 min a pie.',m:PARL},
      {t:'12:30',i:'landmark',n:'Visita al Parlamento',s:'Unos 45 min con guía o audioguía.',m:PARL,tag:'Reservado'},
@@ -591,7 +593,7 @@ var FIX={
  30:[{t:'01:45',i:'clock',n:'Despertar',s:'DNI, cargadores y tarjeta de embarque a mano.'},
      {t:'02:15',i:'bed',n:'Check-out y salida hacia Deák',s:'3 a 5 min andando. Si prefieres taxi, pídelo la noche antes.',m:DEAK},
      {t:'02:45',i:'bus',n:'Bus 100E al aeropuerto',s:'De madrugada pasa poco: mira el horario en BudapestGO.',m:DEAK,tag:'Confirmar',g:'g-bus'},
-     {t:'03:30',i:'plane',n:'Llegada al aeropuerto',s:'Plan B: taxi oficial, unos 10.800 Ft (≈ 27 €). Evita a quien te ofrezca taxi en llegadas.',m:AIR},
+     {t:'03:30',i:'plane',n:'Llegada al aeropuerto',s:'Plan B: taxi oficial, unos 27 € (10.800 Ft). Evita a quien te ofrezca taxi en llegadas.',m:AIR},
      {t:'05:55',i:'plane',n:'Despegue',s:'Embarque unos 30 min antes.'}]
 };
 var NOTE={
@@ -628,21 +630,21 @@ var V=[
  {id:'pista',c:'nav',i:'snow',n:'Pista de hielo de Városliget',z:'Parque de la ciudad',mo:1,ck:1,h:null,
   d:'Junto al castillo Vajdahunyad. Abre desde el 20 de noviembre, si el tiempo lo permite.',f:[['alert','No he encontrado horario diario ni precio.']],m:'Városliget ice rink, Budapest'},
  {id:'lumina',c:'nav',i:'spark',n:'Lumina Park',z:'Isla Margarita',p:'18 €',mo:1,ck:1,h:[[ALL,'16:30','21:00','de 16:30 a 21:00 (temporada pasada)']],
-  d:'Parque de luces. Precio y horario son de la temporada pasada.',f:[['alert','Fechas de 2026 sin publicar: confírmalas antes de ir.']],m:'Lumina Park, Margaret Island, Budapest'},
- {id:'tranvia',c:'nav',i:'tram',n:'Tranvía navideño',z:'Líneas normales de tranvía',p:'500 Ft',mo:1,ck:1,h:null,
-  d:'Tranvía con luces que va con billete normal (≈ 1,25 €).',f:[['alert','Fechas de 2026 sin publicar.'],['tip','Puedes bajar en la isla Margarita por Lumina Park.']],m:null},
+  d:'Parque de luces. Precio y horario son de la temporada pasada.',f:[['ticket','Adultos: 18 € (≈ 7.200 Ft).'],['alert','Fechas de 2026 sin publicar: confírmalas antes de ir.']],m:'Lumina Park, Margaret Island, Budapest'},
+ {id:'tranvia',c:'nav',i:'tram',n:'Tranvía navideño',z:'Líneas normales de tranvía',p:'1,25 €',mo:1,ck:1,h:null,
+  d:'Tranvía con luces que va con billete normal.',f:[['ticket','Billete sencillo: 1,25 € (500 Ft).'],['alert','Fechas de 2026 sin publicar.'],['tip','Puedes bajar en la isla Margarita por Lumina Park.']],m:null},
  {id:'szimpla',c:'nav',i:'cart',n:'Mercado de domingo en Szimpla Kert',z:'Barrio judío',pf:1,mo:1,h:[[[29],'09:00','14:00']],
   d:'Producto local y desayuno bajo techo, la hora más tranquila del ruin bar.',f:[['tip','Sal a las 11:00 para llegar bien al Parlamento.']],m:'Szimpla Kert, Kazinczy utca 14, Budapest'},
 
  /* Imprescindibles */
  {id:'parlamento',c:'cla',i:'landmark',n:'Parlamento',z:'Kossuth Lajos tér',p:'Reservado',h:null,
   d:'Tu visita es el domingo 29 a las 12:30.',f:[['clock','En noviembre y diciembre abre hasta las 16:00.'],['shield','Llega a las 12:00 al control con la entrada y el DNI.'],['info','Por fuera se ve gratis desde la orilla.']],m:PARL},
- {id:'basilica',c:'cla',i:'church',n:'Basílica de San Esteban',z:'A 3 min del hotel',ck:1,h:null,
-  d:'Mira si se puede subir a la cúpula.',f:[['alert','Precio y horario sin confirmar.']],m:"St. Stephen's Basilica, Budapest"},
+ {id:'basilica',c:'cla',i:'church',n:'Basílica de San Esteban',z:'A 3 min del hotel',p:'desde 7 €',ck:1,h:null,
+  d:'Iglesia, cúpula con vistas y tesoro.',f:[['ticket','Solo la iglesia: ≈ 7 € (2.600 Ft).'],['ticket','Cúpula y tesoro: ≈ 13 € (5.000 Ft).'],['ticket','Entrada completa: ≈ 18 € (6.800 Ft).'],['clock','Horario sin confirmar.']],m:"St. Stephen's Basilica, Budapest"},
  {id:'bastion',c:'cla',i:'castle',n:'Bastión de los Pescadores',z:'Castillo de Buda',pf:1,h:'24',
   d:'Gratis de día y de noche. Solo se paga la terraza alta (1.700 Ft ≈ 4 €).',f:[['tip','Sube gratis con el ascensor «Lift a várba» o el bus 16 (lo tienes en Guía).']],m:"Fisherman's Bastion, Budapest"},
- {id:'matias',c:'cla',i:'church',n:'Iglesia de Matías',z:'Castillo de Buda',ck:1,h:null,
-  d:'Junto al bastión. Puede cerrar a visitas por misas.',f:[['alert','Precio y horario sin confirmar.']],m:'Matthias Church, Budapest'},
+ {id:'matias',c:'cla',i:'church',n:'Iglesia de Matías',z:'Castillo de Buda',p:'8,50 €',ck:1,h:null,
+  d:'Junto al bastión. Puede cerrar a visitas por misas.',f:[['ticket','Adultos: ≈ 8,50 € (3.400 Ft).'],['ticket','Con audioguía: ≈ 12,50 € (5.000 Ft).'],['clock','Horario sin confirmar.']],m:'Matthias Church, Budapest'},
  {id:'castillo',c:'cla',i:'castle',n:'Castillo de Buda iluminado',z:'Buda',pf:1,h:'24',
   d:'Bájalo a pie al anochecer: anochece hacia las 16:00 y las vistas del Danubio salen bien.',m:'Buda Castle, Budapest'},
  {id:'cadenas',c:'cla',i:'landmark',n:'Puente de las Cadenas',z:'A 10 min del hotel',pf:1,h:'24',
@@ -674,29 +676,29 @@ var V=[
  /* Termas */
  {id:'szechenyi',c:'ter',i:'bath',n:'Széchenyi',z:'Városliget · metro M1',pw:'33 €',pwe:'37 €',res:1,h:[[ALL,'06:00','22:00']],
   d:'El clásico: 18 piscinas que humean en invierno. El más lleno.',
-  f:[['ticket','13.200 Ft entre semana · 14.800 Ft fin de semana · cabina +1.000 Ft.'],['tip','«Good Morning» antes de las 9:00 (lun a jue): 10.500 Ft (≈ 26 €).'],['alert','Se llena desde las 11:00. El Fast Track online te salta la cola (mañana antes de las 11:00 o tarde después de las 15:00).']],m:'Széchenyi Thermal Bath, Budapest'},
+  f:[['ticket','Entre semana 33 € (13.200 Ft) · fin de semana 37 € (14.800 Ft) · cabina +2,50 € (1.000 Ft).'],['tip','«Good Morning» antes de las 9:00 (lun a jue): 26 € (10.500 Ft).'],['alert','Se llena desde las 11:00. El Fast Track online te salta la cola (mañana antes de las 11:00 o tarde después de las 15:00).']],m:'Széchenyi Thermal Bath, Budapest'},
  {id:'rudas',c:'ter',i:'bath',n:'Rudas',z:'Buda · tranvía 19 o 41',pw:'30 €',pwe:'37 €',res:1,h:null,
   d:'Baño otomano con cúpula y piscina en la azotea con vistas al Danubio.',
-  f:[['ticket','12.000 Ft entre semana · 15.000 Ft fin de semana.'],['info','Entre semana la zona histórica tiene días por sexo; el fin de semana es mixta.'],['clock','Horario de día sin confirmar.']],m:'Rudas Thermal Bath, Budapest'},
+  f:[['ticket','Entre semana 30 € (12.000 Ft) · fin de semana 37 € (15.000 Ft).'],['info','Entre semana la zona histórica tiene días por sexo; el fin de semana es mixta.'],['clock','Horario de día sin confirmar.']],m:'Rudas Thermal Bath, Budapest'},
  {id:'rudasn',c:'ter',i:'moon',n:'Rudas de noche',z:'Buda',p:'37 €',mo:1,res:1,h:[[FIN,'22:00','03:00']],
-  d:'Sesión nocturna viernes y sábado (15.000 Ft), solo online.',f:[['alert','No está claro si la piscina de la azotea entra: pregúntalo antes de pagar.']],m:'Rudas Thermal Bath, Budapest'},
+  d:'Sesión nocturna viernes y sábado, solo online.',f:[['ticket','37 € (15.000 Ft).'],['alert','No está claro si la piscina de la azotea entra: pregúntalo antes de pagar.']],m:'Rudas Thermal Bath, Budapest'},
  {id:'lukacs',c:'ter',i:'bath',n:'Lukács',z:'Buda · tranvía 17 o 19',pw:'18 €',pwe:'20 €',res:1,h:[[ALL,'06:00','20:00','hasta las 20:00 más o menos']],
-  d:'El de los locales, con piscinas exteriores todo el año.',f:[['ticket','7.000 Ft entre semana · 8.000 Ft fin de semana.'],['tip','Entrada de tarde (últimas 2 h, entre semana): 3.800 Ft (≈ 9,50 €). Gratis con Budapest Card.']],m:'Lukács Thermal Bath, Budapest'},
+  d:'El de los locales, con piscinas exteriores todo el año.',f:[['ticket','Entre semana 18 € (7.000 Ft) · fin de semana 20 € (8.000 Ft).'],['tip','Entrada de tarde (últimas 2 h, entre semana): 9,50 € (3.800 Ft). Gratis con Budapest Card.']],m:'Lukács Thermal Bath, Budapest'},
  {id:'velibej',c:'ter',i:'bath',n:'Veli Bej',z:'Buda',pw:'14 a 17 €',pwe:'18 €',ck:1,h:null,
   d:'Baño otomano pequeño (80 personas), sesiones de 3 h.',
-  f:[['clock','Mañanas de miércoles a domingo, tardes a diario. Sábado por la tarde hasta las 21:00.'],['ticket','Solo en taquilla: llega 15 min antes de la sesión.']],m:'Veli Bej Thermal Bath, Budapest'},
+  f:[['clock','Mañanas de miércoles a domingo, tardes a diario. Sábado por la tarde hasta las 21:00.'],['ticket','Entre semana 14 a 17 € (5.700 a 6.700 Ft) · fin de semana 18 € (7.200 Ft).'],['alert','Solo en taquilla: llega 15 min antes de la sesión.']],m:'Veli Bej Thermal Bath, Budapest'},
  {id:'palatinus',c:'ter',i:'bath',n:'Palatinus',z:'Isla Margarita',pw:'15 €',pwe:'16 €',h:[[ALL,'09:00','19:00']],
-  d:'Con parte exterior calefactada. Solo de día.',f:[['ticket','6.000 Ft entre semana · 6.500 Ft fin de semana.']],m:'Palatinus Strand, Margaret Island, Budapest'},
+  d:'Con parte exterior calefactada. Solo de día.',f:[['ticket','Entre semana 15 € (6.000 Ft) · fin de semana 16 € (6.500 Ft).']],m:'Palatinus Strand, Margaret Island, Budapest'},
  {id:'gellert',c:'ter',i:'bath',n:'Gellért',z:'Buda',x:'Cerrado por reforma hasta 2028',h:[],d:'No lo cuentes. Király también está cerrado.',m:null},
 
  /* Danubio */
  {id:'d-publico',c:'dan',i:'ship',n:'Barco público BKK',z:'Desde Petőfi tér',p:'≈ 1,90 €',ck:1,h:null,
-  d:'Barco de línea, sin copa ni guía (unos 750 Ft).',f:[['alert','Dos guías dicen que D11 y D12 ya no navegan; BKK solo lista la D14, que no pasa por el Parlamento.'],['ticket','No vale el billete sencillo: billete propio o abono de 24 o 72 h.']],m:null},
- {id:'d-basico',c:'dan',i:'ship',n:'Crucero básico',z:'Orilla de Pest',p:'10 a 15 €',h:null,d:'Paseo de 60 min con audioguía, sin consumición.',f:[['shirt','Gorro y guantes si vas en cubierta.']],m:null},
- {id:'d-copa',c:'dan',i:'wine',n:'Crucero con copa',z:'Orilla de Pest',p:'19 a 65 €',mo:0,h:null,d:'Al anochecer, 1 h, con una copa y audioguía. Ej.: Legenda, 25 €.',m:null},
- {id:'d-prosecco',c:'dan',i:'wine',n:'Crucero con prosecco ilimitado',z:'Orilla de Pest',p:'19 a 65 €',h:null,d:'Barra de prosecco abierta durante el paseo.',m:null},
- {id:'d-fiesta',c:'dan',i:'music',n:'Fiesta a bordo',z:'Orilla de Pest',p:'desde 28 €',h:null,d:'Barco con DJ; copas según el paquete.',m:null},
- {id:'d-cena',c:'dan',i:'food',n:'Cena crucero',z:'Orilla de Pest',p:'69 a 110 €',res:1,h:null,d:'Cena a la carta con vistas.',f:[['shirt','Informal elegante suele bastar.']],m:null},
+  d:'Barco de línea, sin copa ni guía.',f:[['ticket','≈ 1,90 € (unos 750 Ft).'],['alert','Dos guías dicen que D11 y D12 ya no navegan; BKK solo lista la D14, que no pasa por el Parlamento.'],['ticket','No vale el billete sencillo: billete propio o abono de 24 o 72 h.']],m:null},
+ {id:'d-basico',c:'dan',i:'ship',n:'Crucero básico',z:'Orilla de Pest',p:'10 a 15 €',h:null,d:'Paseo de 60 min con audioguía, sin consumición.',f:[['ticket','10 a 15 € (4.000 a 6.000 Ft).'],['shirt','Gorro y guantes si vas en cubierta.']],m:null},
+ {id:'d-copa',c:'dan',i:'wine',n:'Crucero con copa',z:'Orilla de Pest',p:'19 a 65 €',mo:0,h:null,d:'Al anochecer, 1 h, con una copa y audioguía.',f:[['ticket','19 a 65 € (7.600 a 26.000 Ft). Legenda: 25 € (10.000 Ft).']],m:null},
+ {id:'d-prosecco',c:'dan',i:'wine',n:'Crucero con prosecco ilimitado',z:'Orilla de Pest',p:'19 a 65 €',h:null,d:'Barra de prosecco abierta durante el paseo.',f:[['ticket','19 a 65 € (7.600 a 26.000 Ft).']],m:null},
+ {id:'d-fiesta',c:'dan',i:'music',n:'Fiesta a bordo',z:'Orilla de Pest',p:'desde 28 €',h:null,d:'Barco con DJ; copas según el paquete.',f:[['ticket','Desde 28 € (unos 11.200 Ft).']],m:null},
+ {id:'d-cena',c:'dan',i:'food',n:'Cena crucero',z:'Orilla de Pest',p:'69 a 110 €',res:1,h:null,d:'Cena a la carta con vistas.',f:[['ticket','69 a 110 € (27.600 a 44.000 Ft).'],['shirt','Informal elegante suele bastar.']],m:null},
 
  /* Paseos */
  {id:'subir',c:'pas',i:'castle',n:'Subir al castillo sin funicular',z:'Ybl Miklós tér 4',pf:1,h:[[ALL,'09:00','22:00']],
@@ -861,7 +863,7 @@ function detail(p,d){
   else if(p.kind==='v'&&st.k==='unk'&&!(p.f||[]).some(function(x){return x[0]==='clock'}))f.push(['clock','Horario sin confirmar']);
   if(st.k==='closed')f.push(['xc','<b>'+esc(st.t)+'</b>']);
   if(p.kind==='c'){
-    if(p.r)f.push(['ticket',esc(p.r)]);
+    if(p.r)f.push(['ticket',esc(p.r)+huf(p.r)]);
     if(p.cash)f.push(['cash','Lleva efectivo']);
     if(p.card)f.push(['card','Acepta tarjeta']);
     if(p.res)f.push(['cal','Conviene reservar']);
@@ -882,13 +884,30 @@ function detail(p,d){
   if(a)h+='<div class="acts">'+a+'</div>';
   return h;
 }
+/* «10 a 30 €» → « (≈ 4.000 a 12.000 Ft)», con 1 € ≈ 400 Ft */
+function huf(t){
+  if(t.indexOf('€')<0||t.indexOf('Ft')>-1)return '';
+  var n=t.match(/\d+(?:,\d+)?/g); if(!n)return '';
+  var v=n.map(function(x){return Math.round(parseFloat(x.replace(',','.'))*400/100)*100}).map(function(x){return String(x).replace(/\B(?=(\d{3})+(?!\d))/g,'.')});
+  return ' (≈ '+v.join(' a ')+' Ft)';
+}
 function more(i,t,b){return '<details class="more"><summary>'+ic(i,'sm')+t+ic('chev','chev')+'</summary>'+b+'</details>'}
 document.addEventListener('click',function(e){
   var b=e.target.closest('.it-h'); if(!b)return;
   var dEl=document.getElementById(b.getAttribute('aria-controls')), open=b.getAttribute('aria-expanded')!=='true';
-  if(open){dEl.innerHTML=detail(BY[dEl.dataset.id],DAY)}
-  dEl.hidden=!open; b.setAttribute('aria-expanded',open?'true':'false');
+  b.setAttribute('aria-expanded',open?'true':'false');
+  if(open){dEl.innerHTML=detail(BY[dEl.dataset.id],DAY);dEl.hidden=false;slide(dEl,0,dEl.scrollHeight)}
+  else slide(dEl,dEl.offsetHeight,0,function(){dEl.hidden=true});
 });
+/* desliza la altura de un bloque; sin animación si el móvil pide menos movimiento */
+function slide(el,a,b,done){
+  if(el._an)el._an.cancel();
+  if(reduced()||!el.animate){done&&done();return}
+  el.style.overflow='hidden';
+  var an=el._an=el.animate([{height:a+'px'},{height:b+'px'}],{duration:300,easing:'cubic-bezier(.2,.8,.2,1)'});
+  an.onfinish=function(){el.style.overflow='';el._an=null;done&&done()};
+  an.oncancel=function(){el.style.overflow='';el._an=null};
+}
 
 /* ================= reservas ================= */
 var RES=load('bud26res',[]);
@@ -1042,11 +1061,31 @@ function renderAll(){renderWhen();renderDays();renderHoy();renderList('ver');ren
 $('#days').addEventListener('click',function(e){var b=e.target.closest('.dbtn');if(!b)return;DAY=+b.dataset.day;ui.day=DAY;save('bud26ui2',ui);renderDays();renderHoy();renderList('ver');renderList('comer');if(VIEW==='hoy')scroller.scrollTop=0});
 
 function scrollTo(el){scroller.scrollTop+=el.getBoundingClientRect().top-scroller.getBoundingClientRect().top-12}
-/* acordeones de un solo abierto: al cerrarse el de arriba, el que tocas no se mueve de debajo del dedo */
+/* acordeones: se abren y se cierran deslizando. Si es de los de «uno abierto a la vez»,
+   el que estaba abierto se cierra a la vez y el que tocas se queda quieto bajo el dedo. */
+var ACC='details.acc,details.ideas,details.more';
+function accClose(d,done){
+  d.classList.add('closing');
+  slide(d,d.offsetHeight,d.querySelector('summary').offsetHeight,function(){d.open=false;d.classList.remove('closing');done&&done()});
+}
+function accOpen(d){
+  var name=d.getAttribute('name'); if(name)d.removeAttribute('name');
+  var h0=d.offsetHeight; d.open=true; var h1=d.offsetHeight;
+  slide(d,h0,h1);
+  if(name)setTimeout(function(){d.setAttribute('name',name)},reduced()?0:340);
+}
+function hold(el){
+  var top=el.getBoundingClientRect().top, t0=performance.now();
+  (function f(){var dy=el.getBoundingClientRect().top-top; if(Math.abs(dy)>.5)scroller.scrollTop+=dy; if(performance.now()-t0<380)requestAnimationFrame(f)})();
+}
 document.addEventListener('click',function(e){
-  var s=e.target.closest('details[name] > summary'); if(!s)return;
-  var top=s.getBoundingClientRect().top;
-  requestAnimationFrame(function(){var d=s.getBoundingClientRect().top-top; if(Math.abs(d)>1)scroller.scrollTop+=d});
+  var s=e.target.closest('summary'); if(!s)return;
+  var d=s.parentElement; if(!d||!d.matches(ACC))return;
+  e.preventDefault();
+  if(d.open&&!d.classList.contains('closing')){accClose(d);return}
+  var name=d.getAttribute('name');
+  if(name)Array.prototype.forEach.call(document.querySelectorAll('details[name="'+name+'"][open]'),function(o){if(o!==d)accClose(o)});
+  hold(s); accOpen(d);
 });
 /* saltar desde Hoy a un sitio */
 function jump(id){
@@ -1128,7 +1167,7 @@ var PROBAR=[
 var FOTO={gulyas:'Gulyas080.jpg',halaszle:"Pot_of_Hungarian_Fisherman's_Soup_(Halászlé,_Karpfensuppe).jpg",gombaleves:'Cream_mushroom_soup_3.jpg',paprikas:'Chicken_Paprikash_(Csirke_Paprikás).jpg',porkolt:'2009-09-gulasch-pörkölt-paprikas-1.jpg',hortobagyi:'Hortobagy_palacsinta.JPG',pato:'034_Polish_cuisine,_Silesian_cuisine_-_Duck_leg_with_Silesian_dumplings,_red_cabbage.jpg',langos:'Langos_Eger_Hungary.jpg',kurtos:'Kürtőskalács2011.jpg',somloi:'Somlói_galuska.jpg',dobos:'Dobos_cake_(Gerbeaud_Confectionery_Budapest_Hungary).jpg',turo:'Túrógombóc.jpg',gundelp:'Gundel_Palacsinta_at_Gundel.jpg',retes:'Strudel.jpg',forralt:'Glühwein_Weinnachtsmarkt_OS.JPG',palinka:'Sopron_barack_07.JPG',vinos:'Szent_Tamás_Szamorodni_2013.jpg',cerveza:'Budapest_IPA_(50227692663).jpg',unicum:'Unicumbottle.png'};
 var MALETA=[
  ['Ropa',[['pc0','Abrigo grueso o plumas','esperarás de noche y saldrás a las 02:15'],['pc1','Capas: jersey, forro polar y camiseta térmica'],['pc2','Gorro, bufanda y guantes'],['pc3','Calzado cerrado e impermeable','cuestas, adoquines y escaleras'],['pc4','Calcetines de abrigo de repuesto'],['pc5','Paraguas pequeño o chubasquero']]],
- ['Termas',[['pb0','Bañador','mejor no blanco: el agua termal puede teñirlo'],['pb1','Chanclas','obligatorias fuera de las piscinas'],['pb2','Toalla grande','alquilarla cuesta más de 1.500 Ft'],['pb3','Bolsa para lo mojado'],['pb4','Gel y champú pequeños'],['pb6','Funda estanca para el móvil'],['pb7','Gorro de lana para la piscina exterior']]],
+ ['Termas',[['pb0','Bañador','mejor no blanco: el agua termal puede teñirlo'],['pb1','Chanclas','obligatorias fuera de las piscinas'],['pb2','Toalla grande','alquilarla cuesta más de 4 € (1.500 Ft)'],['pb3','Bolsa para lo mojado'],['pb4','Gel y champú pequeños'],['pb6','Funda estanca para el móvil'],['pb7','Gorro de lana para la piscina exterior']]],
  ['Documentos y tecnología',[['pd0','DNI o pasaporte','también para el Parlamento'],['pd1','Entrada del Parlamento','domingo 29, 12:30'],['pd2','Tarjeta de embarque','vuelo de las 05:55'],['pd3','BudapestGO instalada y con cuenta'],['pd4','Tarjeta y algo de efectivo en forintos'],['pd5','Tarjeta sanitaria europea o seguro'],['pd6','Batería externa y cargador','el enchufe es el mismo que en España'],['pd7','Medicinas personales']]],
  ['Solo si vas a',[['po0','Ópera: informal elegante'],['po1','Sinagoga: hombros y rodillas cubiertos'],['po2','Crucero o colina: cortavientos'],['po3','Cena a bordo: algo más arreglado']],1]
 ];
